@@ -4,63 +4,68 @@ namespace App\Http\Controllers\DatosGenerales;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Directorios;
 
 class DirectorioController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+
+    // Método para mostrar la lista
+    public function index(Request $request)
     {
-        
-        return view('directorio.listar');
+        // Consulta con búsqueda y paginación
+        $directorios = Directorios::where('nombre', 'like', '%' . $request->input('search') . '%')
+                      ->orWhere('cargo', 'like', '%' . $request->input('search') . '%')
+                      ->paginate(10);
+
+        // Retornar la vista con los datos paginados
+        return view('directorio.listar', compact('directorios'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    // Método para mostrar el formulario de creación
     public function create()
     {
-        //
+        return view('directorio.crear');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Método para almacenar un nuevo directorio
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'id_categoria' => 'required|integer',
+            'foto' => 'required|string',
+            'cargo' => 'required|string',
+            'nombre' => 'required|string',
+            'apellidos' => 'required|string',
+            'correo' => 'required|email',
+            'telefono' => 'required|string',
+        ]);
+
+        Directorios::create($data);
+
+        return redirect()->route('datos-generales.directorio.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    // Método para mostrar el formulario de edición
+    public function edit(Directorios $directorio)
     {
-        //
+        return view('directorio.editar', compact('directorio'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    // Método para actualizar un directorio existente
+    public function update(Request $request, Directorios $directorio)
     {
-        //
-    }
+        $data = $request->validate([
+            'id_categoria' => 'required|integer',
+            'foto' => 'required|string',
+            'cargo' => 'required|string',
+            'nombre' => 'required|string',
+            'apellidos' => 'required|string',
+            'correo' => 'required|email',
+            'telefono' => 'required|string',
+        ]);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        $directorio->update($data);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('datos-generales.directorio.index');
     }
 }

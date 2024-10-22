@@ -28,20 +28,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 
-   // Route::get('/mi-vista', [MiControlador::class, 'index'])->name('mi_vista');
-     Route::name('datos-generales.')->group(function () {
-        Route::resource('/datos-generales/directorio', DirectorioController::class);
-                                                       
 
+    Route::name('datos-generales.')->group(function () {
+        Route::resource('/datos-generales/directorio', DirectorioController::class);
     });
-/*
+    /*
     Route::controller(PageController::class)->group(function () {
         Route::get('/',             'home')->name('home');
         Route::get('blog',          'blog')->name('blog');
         Route::get('blog/{post:slug}',   'post')->name('post');    
     });
-*/    
-/*
+*/
+    /*
      Route::get('/directorio', function () {
         return view('directorio/listar');
     })->name('directorio');*/

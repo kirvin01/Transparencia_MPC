@@ -10,7 +10,7 @@
             data-kt-menu="true" data-kt-menu-expand="false">
             <!--begin:Menu item-->
             <div data-kt-menu-trigger="click"
-                class="menu-item menu-accordion {{ request()->routeIs('dashboard') ? 'here show' : '' }}">
+                class="menu-item menu-accordion {{ request()->routeIs('datos-generales.*') ? 'here show' : '' }}">
                 <!--begin:Menu link-->
                 <span class="menu-link">
                     <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
