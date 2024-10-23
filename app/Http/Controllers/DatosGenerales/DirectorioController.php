@@ -12,13 +12,17 @@ class DirectorioController extends Controller
     // Método para mostrar la lista
     public function index(Request $request)
     {
-        // Consulta con búsqueda y paginación
-        $directorios = Directorios::where('nombre', 'like', '%' . $request->input('search') . '%')
-                      ->orWhere('cargo', 'like', '%' . $request->input('search') . '%')
-                      ->paginate(10);
+         // Obtener el término de búsqueda ingresado
+    $search = $request->input('search');
 
-        // Retornar la vista con los datos paginados
-        return view('directorio.listar', compact('directorios'));
+    // Crear la consulta para buscar en todos los campos relevantes
+    $directorios = Directorios::where('nombre', 'like', '%' . $search . '%')
+        ->orWhere('cargo', 'like', '%' . $search . '%')
+        ->orWhere('apellidos', 'like', '%' . $search . '%')
+        ->orWhere('correo', 'like', '%' . $search . '%')      
+        ->paginate(12); 
+        $titulo = "Lista de Directorios";
+    return view('directorio.listar', compact('directorios','titulo'));
     }
 
     // Método para mostrar el formulario de creación

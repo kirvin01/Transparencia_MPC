@@ -32,17 +32,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::name('datos-generales.')->group(function () {
         Route::resource('/datos-generales/directorio', DirectorioController::class);
     });
-    /*
-    Route::controller(PageController::class)->group(function () {
-        Route::get('/',             'home')->name('home');
-        Route::get('blog',          'blog')->name('blog');
-        Route::get('blog/{post:slug}',   'post')->name('post');    
-    });
-*/
-    /*
-     Route::get('/directorio', function () {
-        return view('directorio/listar');
-    })->name('directorio');*/
+  
 
     Route::name('user-management.')->group(function () {
         Route::resource('/user-management/users', UserManagementController::class);
