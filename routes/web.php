@@ -32,7 +32,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::name('datos-generales.')->group(function () {
         Route::resource('/datos-generales/directorio', DirectorioController::class);
     });
-  
 
     Route::name('user-management.')->group(function () {
         Route::resource('/user-management/users', UserManagementController::class);
