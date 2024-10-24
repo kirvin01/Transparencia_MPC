@@ -24,6 +24,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call(CategoriaSeeder::class);
         $this->call(DirectorioSeeder::class);
+        $this->call(TiposDocumentoSeeder::class);
+        $this->call(EstadosDocumentoSeeder::class);
 
         \App\Models\User::factory(10)->create();
 

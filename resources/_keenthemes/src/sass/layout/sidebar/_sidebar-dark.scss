@@ -73,11 +73,11 @@
                 );
                 
                 @include menu-link-active-state( 
-                    $title-color: $gray-900-dark,
+                    $title-color: #000000,//$gray-900-dark,
                     $icon-color: $gray-900-dark, 
-                    $bullet-color: $gray-900-dark,
+                    $bullet-color:#ffffff,// $gray-900-dark,
                     $arrow-color: $gray-900-dark,
-                    $bg-color: $app-sidebar-dark-menu-link-bg-color-active,
+                    $bg-color:#f0efef, //$app-sidebar-dark-menu-link-bg-color-active,
                     $all-links: true
                 );
             }

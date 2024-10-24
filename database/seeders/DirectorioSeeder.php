@@ -39,7 +39,7 @@ class DirectorioSeeder extends Seeder
         for ($i = 1; $i <= $numRegistros; $i++) {
             Directorios::create([
                 'id_categoria' => rand(1, 4), // Suponiendo que tienes 5 categorías
-                'foto' => 'ruta/a/tu/foto' . $i . '.jpg', // Cambia esto por la lógica para tus fotos
+                'foto' => null,// Cambia esto por la lógica para tus fotos
                 'cargo' => 'Cargo ' . $i,
                 'nombre' => 'Nombre ' . $i,
                 'apellidos' => 'Apellido ' . $i,

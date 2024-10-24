@@ -1,9 +1,3 @@
 <x-default-layout>
-
-
-   
-        @include('directorio._form')
-   
-
-
+    @include('directorio._form')
 </x-default-layout>
