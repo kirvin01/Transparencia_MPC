@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-use App\Models\Categorias;
+use App\Models\Categoria;
 
 class CategoriaSeeder extends Seeder
 {
@@ -14,9 +14,9 @@ class CategoriaSeeder extends Seeder
      */
     public function run(): void
     {
-        Categorias::create(['descripcion' => 'ALCALDÍA']);
-        Categorias::create(['descripcion' => 'CONSEJO MUNICIPAL']);
-        Categorias::create(['descripcion' => 'GERENCIA MUNICIPAL']);
-        Categorias::create(['descripcion' => 'GERENCIAS']);
+        Categoria::create(['descripcion' => 'ALCALDÍA']);
+        Categoria::create(['descripcion' => 'CONSEJO MUNICIPAL']);
+        Categoria::create(['descripcion' => 'GERENCIA MUNICIPAL']);
+        Categoria::create(['descripcion' => 'GERENCIAS']);
     }
 }

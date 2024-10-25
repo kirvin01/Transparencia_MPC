@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
         $this->call(DirectorioSeeder::class);
         $this->call(TiposDocumentoSeeder::class);
         $this->call(EstadosDocumentoSeeder::class);
+        $this->call(DocumentoSeeder::class);
 
         \App\Models\User::factory(10)->create();
 

@@ -6,7 +6,11 @@ use App\Http\Controllers\Apps\UserManagementController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\DashboardController;
 
+
+
 use App\Http\Controllers\DatosGenerales\DirectorioController;
+use App\Http\Controllers\DatosGenerales\DocumentoController;
+
 
 use Illuminate\Support\Facades\Route;
 
@@ -31,7 +35,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::name('datos-generales.')->group(function () {
         Route::resource('/datos-generales/directorio', DirectorioController::class);
+        Route::resource('/datos-generales/documentos', DocumentoController::class);
     });
+
+    
 
     Route::name('user-management.')->group(function () {
         Route::resource('/user-management/users', UserManagementController::class);

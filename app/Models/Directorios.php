@@ -2,10 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Directorios extends Model
 {
+    use HasFactory;
+
+    protected $table = 'directorios';
+
     protected $fillable = [
     	'id_categoria', 
         'foto', 
@@ -17,6 +22,6 @@ class Directorios extends Model
     ];
     public function categorias()
     {
-        return $this->belongsTo(Categorias::class, 'id_categoria');
+        return $this->belongsTo(Categoria::class, 'id_categoria');
     }
 }

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Directorios;
-use App\Models\Categorias;
+use App\Models\Categoria;
 
 class DirectorioController extends Controller
 {
@@ -28,7 +28,7 @@ class DirectorioController extends Controller
     // Método para mostrar el formulario de creación
     public function create()
     {
-        $categorias = Categorias::all(); // Obtener todas las categorías
+        $categorias = Categoria::all(); // Obtener todas las categorías
         return view('directorio._form', compact('categorias'));
         // return view('directorio._form');
     }
@@ -64,7 +64,7 @@ class DirectorioController extends Controller
     // Método para mostrar el formulario de edición
     public function edit(Directorios $directorio)
     {
-        $categorias = Categorias::all(); // Obtener todas las categorías
+        $categorias = Categoria::all(); // Obtener todas las categorías
         return view('directorio._form', compact('directorio', 'categorias'));
        // return view('directorio._form', compact('directorio'));
     }

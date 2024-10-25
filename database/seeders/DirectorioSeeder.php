@@ -6,6 +6,8 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Directorios;
 
+
+
 class DirectorioSeeder extends Seeder
 {
     /**
@@ -14,6 +16,7 @@ class DirectorioSeeder extends Seeder
     
     public function run(): void
     {
+        Directorios::factory()->count(100)->create();
         Directorios::create([
             'id_categoria' => 1, // ID de la categoría 'Administración'
             'foto' => null,
@@ -34,18 +37,6 @@ class DirectorioSeeder extends Seeder
             'telefono' => '987654321'
         ]);
 
-        $numRegistros = 100;
-
-        for ($i = 1; $i <= $numRegistros; $i++) {
-            Directorios::create([
-                'id_categoria' => rand(1, 4), // Suponiendo que tienes 5 categorías
-                'foto' => null,// Cambia esto por la lógica para tus fotos
-                'cargo' => 'Cargo ' . $i,
-                'nombre' => 'Nombre ' . $i,
-                'apellidos' => 'Apellido ' . $i,
-                'correo' => 'correo' . $i . '@ejemplo.com',
-                'telefono' => '123456789' . $i,
-            ]);
-        }
+        
     }
 }
