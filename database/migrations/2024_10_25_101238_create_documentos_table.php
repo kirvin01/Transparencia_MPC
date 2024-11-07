@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('sumilla', 800);
             $table->string('url');
             $table->foreignId('idestado')->constrained('estados_documento')->onDelete('cascade');
-            $table->text('html');
+            $table->text('html')->nullable();
             $table->string('titulo');
             $table->timestamps();
         });

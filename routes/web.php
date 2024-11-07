@@ -27,7 +27,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    Route::get('/', [DashboardController::class, 'index']);
+   // Route::get('/', [DashboardController::class, 'index']);
+
+    Route::get('/', function () {
+        return redirect()->route('datos-generales.directorio.index');
+    });
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -38,7 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('/datos-generales/documentos', DocumentoController::class);
     });
 
-    
+     
 
     Route::name('user-management.')->group(function () {
         Route::resource('/user-management/users', UserManagementController::class);

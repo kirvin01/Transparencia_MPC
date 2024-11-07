@@ -1,46 +1,62 @@
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <div class="mb-3">
-    <label for="idtipo_documento" class="form-label">Tipo de Documento</label>
-    <select name="idtipo_documento" class="form-control" required>
+    <label for="idtipo_documento" class="form-label fw-bold">Tipo de Documento</label>
+    <select name="idtipo_documento" id="idtipo_documento" class="form-select" required>
         @foreach ($tipos as $tipo)
-            <option value="{{ $tipo->id }}" {{ (isset($documento) && $documento->idtipo_documento == $tipo->id) ? 'selected' : '' }}>
+            <option value="{{ $tipo->id }}" 
+                {{ old('idtipo_documento', $documento->idtipo_documento ?? '') == $tipo->id ? 'selected' : '' }}>
                 {{ $tipo->titulo }}
             </option>
         @endforeach
     </select>
 </div>
 
-<div class="mb-3">
-    <label for="numero" class="form-label">Número</label>
-    <input type="text" name="numero" class="form-control" value="{{ $documento->numero ?? '' }}" required>
+<div class="row">
+    <div class="col mb-3">
+        <label for="numero" class="form-label fw-bold">Número</label>
+        <input type="text" name="numero" id="numero" class="form-control" 
+               value="{{ old('numero', $documento->numero ?? '') }}" required>
+    </div>
+
+    <div class="col mb-3">
+        <label for="fecha" class="form-label fw-bold">Fecha</label>
+        <input type="date" name="fecha" id="fecha" class="form-control" 
+               value="{{ old('fecha', isset($documento->fecha) ? \Carbon\Carbon::parse($documento->fecha)->format('Y-m-d') : '') }}" required>
+    </div>
 </div>
 
 <div class="mb-3">
-    <label for="fecha" class="form-label">Fecha</label>
-    <input type="date" name="fecha" class="form-control" value="{{ $documento->fecha ?? '' }}" required>
+    <label for="sumilla" class="form-label fw-bold">Sumilla</label>
+    <textarea name="sumilla" id="sumilla" class="form-control" required>{{ old('sumilla', $documento->sumilla ?? '') }}</textarea>
 </div>
 
 <div class="mb-3">
-    <label for="sumilla" class="form-label">Sumilla</label>
-    <textarea name="sumilla" class="form-control" required>{{ $documento->sumilla ?? '' }}</textarea>
+    <label for="url" class="form-label fw-bold">Subir PDF</label>
+    <input type="file" name="url" id="url" class="form-control" accept="application/pdf" {{ isset($documento) ? '' : 'required' }}>
+    @if(isset($documento) && $documento->url)
+        <small class="form-text text-muted">Archivo actual: 
+            <a href="{{ asset('storage/' . $documento->url) }}" target="_blank">Ver PDF actual</a>
+        </small>
+    @endif
 </div>
 
 <div class="mb-3">
-    <label for="url" class="form-label">URL</label>
-    <input type="url" name="url" class="form-control" value="{{ $documento->url ?? '' }}" required>
-</div>
-
-<div class="mb-3">
-    <label for="idestado" class="form-label">Estado</label>
-    <select name="idestado" class="form-control" required>
+    <label for="idestado" class="form-label fw-bold">Estado</label>
+    <select name="idestado" id="idestado" class="form-select" required>
         @foreach ($estados as $estado)
-            <option value="{{ $estado->id }}" {{ (isset($documento) && $documento->idestado == $estado->id) ? 'selected' : '' }}>
+            <option value="{{ $estado->id }}" 
+                {{ old('idestado', $documento->idestado ?? '') == $estado->id ? 'selected' : '' }}>
                 {{ $estado->descripcion }}
             </option>
         @endforeach
     </select>
-</div>
-
-<div class="mb-3">
-    <label for="titulo" class="form-label">Título</label>
-    <input type="text" name="titulo" class="form-control" value="{{ $documento->titulo ?? '' }}" required>
 </div>
