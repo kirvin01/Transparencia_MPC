@@ -9,3 +9,5 @@ module.exports = [
     ...coreLayoutJs,
     'resources/mix/common/button-ajax.js'
 ];
+
+

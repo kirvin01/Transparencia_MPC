@@ -43,6 +43,7 @@ mix.sass('resources/mix/plugins.scss', `public/assets/plugins/global/plugins.bun
     .scripts(require('./resources/mix/plugins.js'), `public/assets/plugins/global/plugins.bundle.js`);
 
 // Build theme css/js
+mix.sass(`${dir}/sass/landing.scss`, 'public/assets/css/landing.css'); // Compila landing.scss
 mix.sass(`${dir}/sass/style.scss`, `public/assets/css/style.bundle.css`, {sassOptions: {includePaths: ['node_modules']}})
     // .options({processCssUrls: false})
     .scripts(require(`./resources/mix/scripts.js`), `public/assets/js/scripts.bundle.js`);

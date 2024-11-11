@@ -1,48 +1,32 @@
 <?php
 
-use App\Http\Controllers\Apps\PermissionManagementController;
-use App\Http\Controllers\Apps\RoleManagementController;
-use App\Http\Controllers\Apps\UserManagementController;
-use App\Http\Controllers\Auth\SocialiteController;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DashboardController;
-
-
-
 use App\Http\Controllers\DatosGenerales\DirectorioController;
 use App\Http\Controllers\DatosGenerales\DocumentoController;
+use App\Http\Controllers\Apps\UserManagementController;
+use App\Http\Controllers\Apps\RoleManagementController;
+use App\Http\Controllers\Apps\PermissionManagementController;
+use App\Http\Controllers\Auth\SocialiteController;
 
+Route::get('/', function () {
+    // Si el usuario está autenticado, redirigir al dashboard
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+    // Si no está autenticado, mostrar la vista de landing
+    return view('landing.landing');
+})->name('landing');
 
-use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
+// Rutas protegidas solo para usuarios autenticados y verificados
 Route::middleware(['auth', 'verified'])->group(function () {
-
-   // Route::get('/', [DashboardController::class, 'index']);
-
-    Route::get('/', function () {
-        return redirect()->route('datos-generales.directorio.index');
-    });
-
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-
 
     Route::name('datos-generales.')->group(function () {
         Route::resource('/datos-generales/directorio', DirectorioController::class);
         Route::resource('/datos-generales/documentos', DocumentoController::class);
     });
-
-     
 
     Route::name('user-management.')->group(function () {
         Route::resource('/user-management/users', UserManagementController::class);
@@ -51,10 +35,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
+// Rutas de autenticación
+Route::get('/auth/redirect/{provider}', [SocialiteController::class, 'redirect']);
+
+// Ruta de error
 Route::get('/error', function () {
     abort(500);
 });
-
-Route::get('/auth/redirect/{provider}', [SocialiteController::class, 'redirect']);
 
 require __DIR__ . '/auth.php';

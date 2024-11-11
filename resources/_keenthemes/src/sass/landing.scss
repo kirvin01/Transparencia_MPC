@@ -1,0 +1,8 @@
+// Importa solo Bootstrap si es necesario en landing
+@import "~bootstrap/scss/bootstrap";
+
+// Agrega estilos específicos de landing aquí
+body {
+    background-color: #f8f9fa;
+    color: #333;
+}
