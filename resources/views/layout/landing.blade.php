@@ -1,27 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Landing Page')</title>
-    <!-- Agrega los enlaces de CSS y scripts específicos para la landing page -->
+    <title>TRANSPARENCIA INSTITUCIONAL</title>
+    {{-- Incluye aquí CSS de Bootstrap y estilos adicionales --}}
     <link rel="stylesheet" href="{{ asset('assets/css/landing.css') }}">
-    
 </head>
-<body>
-    <header>
-        <!-- Encabezado específico para la landing page -->
-    </header>
 
+<body>
+    {{-- Incluir Header --}}
+    @include('landing.components.header')
+
+    {{-- Contenido principal de la página --}}
     <main>
         @yield('content')
     </main>
 
-    <footer>
-        <!-- Pie de página específico para la landing page -->
-    </footer>
+    {{-- Incluir Footer --}}
+    @include('landing.components.footer')
 
-    <!-- Scripts de JavaScript específicos para la landing page -->
-    <script src="{{ asset('js/landing.js') }}"></script>
+    {{-- Incluye aquí JavaScript, Bootstrap y Vue.js --}}
+    <script src="{{ asset('assets/js/landing.js') }}"></script>
+    
 </body>
+
 </html>

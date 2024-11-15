@@ -15,7 +15,22 @@ const WebpackRTLPlugin = require('webpack-rtl-plugin');
  | file for the application as well as bundling up all the JS files.
  |
  */
+ //const path = require('path');
 
+ mix.webpackConfig({
+     resolve: {
+         alias: {
+             'vue': 'vue/dist/vue.esm-bundler.js',
+         }
+     }, // Configuración de los feature flags de Vue
+     plugins: [
+         new (require('webpack')).DefinePlugin({
+             __VUE_OPTIONS_API__: true,  // Si estás usando la API de opciones de Vue (por defecto en Vue 2)
+             __VUE_PROD_DEVTOOLS__: false,  // No necesitas devtools en producción
+             __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false  // Desactivar esta opción en producción
+         })
+     ]
+ });
 // arguments/params from the line command
 const args = getParameters();
 
@@ -168,3 +183,6 @@ function getParameters() {
 
     return args;
 }
+
+//vue.js
+mix.js('resources/js/landing.js', 'public/assets/js');
