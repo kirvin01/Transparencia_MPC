@@ -7,26 +7,43 @@ use App\Models\Documento;
 use App\Models\TipoDocumento;
 use App\Models\EstadoDocumento;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+
+use Illuminate\Support\Facades\Log;
+
+/*clases Min*/
+use App\Services\MinStorageService;
 
 class DocumentoController extends Controller
 {
+    protected $minStorage;
+
+    public function __construct(MinStorageService $minStorage)
+    {
+        $this->minStorage = $minStorage;
+    }
     public function index(Request $request)
     {
         $keyword = $request->input('search');
-        $query = Documento::orderBy('fecha', 'desc');
+        $query = Documento::orderBy('created_at', 'desc');
 
         if ($keyword) {
             $query->where('titulo', 'like', "%{$keyword}%")
-                  ->orWhere('numero', 'like', "%{$keyword}%")
-                  ->orWhere('sumilla', 'like', "%{$keyword}%");
+                ->orWhere('numero', 'like', "%{$keyword}%")
+                ->orWhere('sumilla', 'like', "%{$keyword}%");
         }
 
         $documentos = $query->paginate(10);
+        // Transformar las URLs de los documentos usando getUrl
+        
+        $documentos->getCollection()->transform(function ($documento) {
+            $documento->url = $this->minStorage->getUrl($documento->url); // Reemplaza el valor de URL con la URL completa
+            return $documento;
+        });
+        
         $tipos = TipoDocumento::all();
         $estados = EstadoDocumento::all();
         $documentos->appends(['search' => $keyword]);
-
+       // dd($documentos->items());
         return view('documentos.crud.index', compact('documentos', 'tipos', 'estados', 'keyword'));
     }
 
@@ -39,47 +56,76 @@ class DocumentoController extends Controller
 
     public function store(Request $request)
     {
-        $this->validateDocumento($request);
+        try {
+            // Validar los datos del formulario, incluyendo tipo y tamaño del archivo
+            $request->validate([
+                'archivo' => 'required|file|mimes:pdf|max:102400', // Solo PDF, máximo 100 MB
+                'idtipo_documento' => 'required|exists:tipo_documentos,id', // Validar tipo de documento
+                'numero' => 'required|string',
+                'fecha' => 'required|date',
+                'sumilla' => 'required|string',
+                'idestado' => 'required|integer',
+            ]);
 
-        $tipoDocumento = TipoDocumento::find($request->idtipo_documento);
-       
+            // Obtener el tipo de documento
+            $tipoDocumento = TipoDocumento::findOrFail($request->idtipo_documento);
 
-        // Configurar la ruta de almacenamiento: documentos/<año>/<Carpeta>
-        $year = date('Y', strtotime($request->fecha));
-        $folderPath = 'documentos/' . $year . '/' . $tipoDocumento->Carpeta;
-        $fileName = $tipoDocumento->Abreviatura . '_' . $request->numero . '.pdf';
-        $fullPath = $folderPath . '/' . $fileName;
+            // Configurar la ruta de almacenamiento
+            $year = date('Y', strtotime($request->fecha));
+            $folderPath = 'documentos/' . $year . '/' . $tipoDocumento->Carpeta;
 
-        $tituloConcatenado = $tipoDocumento->titulo . " N° " . $request->numero.'-'. $year;
+            // Generar el título concatenado
+            $tituloConcatenado = $tipoDocumento->titulo . " N° " . $request->numero . '-' . $year;
 
-        // Verificar duplicados en el campo 'titulo' y 'url'
-        if (Documento::where('titulo', $tituloConcatenado)->exists()) {
-            return back()->withErrors(['titulo' => 'Ya existe un documento con el mismo título.']);
+            // Verificar duplicados en la base de datos (título)
+            if (Documento::where('titulo', $tituloConcatenado)->exists()) {
+                return back()->withErrors(['titulo' => 'Ya existe un documento con el mismo título.']);
+            }
+
+            // Validar que el archivo está presente en la solicitud y sea válido
+            if (!$request->hasFile('archivo') || !$request->file('archivo')->isValid()) {
+                return back()->withErrors(['archivo' => 'Debe seleccionar un archivo válido para subir.']);
+            }
+
+            // Obtener el archivo y generar el nombre deseado
+            $archivo = $request->file('archivo');
+            $fileName = $tipoDocumento->Abreviatura . '_' . $request->numero . '.pdf';
+
+            // Subir el archivo al almacenamiento
+            $resultado = $this->minStorage->uploadFile($archivo, $folderPath, $fileName);
+
+            // Verificar que el archivo se subió correctamente
+            if (empty($resultado['ruta'])) {
+                return back()->withErrors(['archivo' => 'No se pudo subir el archivo. Inténtelo nuevamente.']);
+            }
+            // dd($request->idtipo_documentost);
+            // Crear el registro en la base de datos
+            Documento::create([
+                'idtipo_documento' => $request->idtipo_documento,
+                'numero' => $request->numero,
+                'fecha' => $request->fecha,
+                'sumilla' => $request->sumilla,
+                'url' => $resultado['ruta'],
+                'idestado' => $request->idestado,
+                'titulo' => $tituloConcatenado,
+            ]);
+
+            // Redireccionar con mensaje de éxito
+            return redirect()->route('datos-generales.documentos.index')->with('success', 'Documento creado exitosamente.');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Error si no se encuentra el tipo de documento
+            return back()->withErrors(['idtipo_documento' => 'El tipo de documento no existe.']);
+        } catch (\Exception $e) {
+            // Manejo de errores generales
+            return back()->withErrors(['error' => 'Ha ocurrido un error: ' . $e->getMessage()]);
         }
-
-        if (file_exists(storage_path('app/public/' . $fullPath))) {
-            return back()->withErrors(['url' => 'Ya existe un archivo con el mismo nombre.']);
-        }
-
-        // Guardar el archivo en la ruta configurada
-        if ($request->hasFile('url') && $request->file('url')->isValid()) {
-            $request->file('url')->storeAs($folderPath, $fileName, 'public');
-        }
-
-        Documento::create([
-            'idtipo_documento' => $request->idtipo_documento,
-            'numero' => $request->numero,
-            'fecha' => $request->fecha,
-            'sumilla' => $request->sumilla,
-            'url' => $fullPath,
-            'idestado' => $request->idestado,
-            'titulo' => $tituloConcatenado,
-        ]);
-
-        return redirect()->route('datos-generales.documentos.index')->with('success', 'Documento creado exitosamente.');
     }
 
-    public function edit(Documento $documento) 
+
+
+
+
+    public function edit(Documento $documento)
     {
         $tipos = TipoDocumento::all();
         $estados = EstadoDocumento::all();
@@ -88,61 +134,78 @@ class DocumentoController extends Controller
 
     public function update(Request $request, Documento $documento)
     {
+        // Validar los datos del formulario
         $this->validateDocumento($request);
 
-        $tipoDocumento = TipoDocumento::find($request->idtipo_documento);
-       
+        try {
+            // Obtener el tipo de documento
+            $tipoDocumento = TipoDocumento::findOrFail($request->idtipo_documento);
 
-        // Configurar la ruta de almacenamiento
-        $year = date('Y', strtotime($request->fecha));
-        $folderPath = 'documentos/' . $year . '/' . $tipoDocumento->Carpeta;
-        $fileName = $tipoDocumento->Abreviatura . '_' . $request->numero . '.pdf';
-        $fullPath = $folderPath . '/' . $fileName;
-        $tituloConcatenado = $tipoDocumento->titulo . " N° " . $request->numero.'-'.$year;
+            // Configurar carpeta y nombre del archivo
+            $year = date('Y', strtotime($request->fecha));
+            $folderPath = 'documentos/' . $year . '/' . $tipoDocumento->Carpeta;
+            $fileName = $tipoDocumento->Abreviatura . '_' . $request->numero . '.pdf';
+            $tituloConcatenado = $tipoDocumento->titulo . " N° " . $request->numero . '-' . $year;
 
-
-        // Verificar duplicados en el campo 'titulo' y 'url'
-        if (Documento::where('titulo', $tituloConcatenado)->where('id', '!=', $documento->id)->exists()) {
-            return back()->withErrors(['titulo' => 'Ya existe un documento con el mismo título.']);
-        }
-
-        if ($request->hasFile('url') && file_exists(storage_path('app/public/' . $fullPath)) && $fullPath != $documento->url) {
-            return back()->withErrors(['url' => 'Ya existe un archivo con el mismo nombre.']);
-        }
-
-        // Eliminar el archivo anterior si se va a cargar uno nuevo
-        if ($request->hasFile('url') && $request->file('url')->isValid()) {
-            if (file_exists(storage_path('app/public/' . $documento->url))) {
-                unlink(storage_path('app/public/' . $documento->url));
+            // Verificar duplicados en el título
+            if (Documento::where('titulo', $tituloConcatenado)->where('id', '!=', $documento->id)->exists()) {
+                return back()->withErrors(['titulo' => 'Ya existe un documento con el mismo título.']);
             }
 
-            // Guardar el nuevo archivo
-            $request->file('url')->storeAs($folderPath, $fileName, 'public');
-            $documento->url = $fullPath;
+            // Manejo del archivo (si se cargó un nuevo archivo)
+            if ($request->hasFile('archivo') && $request->file('archivo')->isValid()) {
+                // Eliminar archivo antiguo
+                if (!empty($documento->url) && $this->minStorage->fileExists($documento->url)) {
+                    $deleteResult = $this->minStorage->deleteFile($documento->url);
+                   // dd($deleteResult);
+                    if (isset($deleteResult['error']) && $deleteResult['error']) {
+                        throw new \Exception('Error al eliminar el archivo antiguo: ' . $deleteResult['message']);
+                    }
+                }
+
+                // Subir el nuevo archivo
+                $uploadResult = $this->minStorage->uploadFile($request->file('archivo'), $folderPath, $fileName);
+                if (empty($uploadResult['ruta'])) {
+                    throw new \Exception('No se pudo subir el nuevo archivo.');
+                }
+
+                // Actualizar la URL del archivo en el documento
+                $documento->url = $uploadResult['ruta'];
+            }
+
+            // Actualizar los datos del documento
+            $documento->update([
+                'idtipo_documento' => $request->idtipo_documento,
+                'numero' => $request->numero,
+                'fecha' => $request->fecha,
+                'sumilla' => $request->sumilla,
+                'url' => $documento->url,
+                'idestado' => $request->idestado,
+                'titulo' => $tituloConcatenado,
+                'fechapubli' => $documento->fechapubli ?? now(),
+                'html' => $documento->html ?? null,
+            ]);
+
+            // Redireccionar con mensaje de éxito
+            return redirect()->route('datos-generales.documentos.index')->with('success', 'Documento actualizado exitosamente.');
+        } catch (\Exception $e) {
+            // Registrar el error y redirigir con mensaje
+            \Log::error('Error en la actualización del documento: ' . $e->getMessage());
+            return back()->withErrors(['error' => $e->getMessage()]);
         }
-
-        // Actualizar el documento en la base de datos
-        $documento->update([
-            'idtipo_documento' => $request->idtipo_documento,
-            'numero' => $request->numero,
-            'fecha' => $request->fecha,
-            'sumilla' => $request->sumilla,
-            'url' => $documento->url,
-            'idestado' => $request->idestado,
-            'titulo' => $tituloConcatenado,
-            'fechapubli' => $documento->fechapubli ?? now(),
-            'html' => $documento->html ?? null,
-        ]);
-
-        return redirect()->route('datos-generales.documentos.index')->with('success', 'Documento actualizado exitosamente.');
     }
+
+
 
     public function destroy(Documento $documento)
     {
         // Renombrar el archivo en lugar de eliminarlo
-        if (file_exists(storage_path('app/public/' . $documento->url))) {
-            $newPath = str_replace('.pdf', '_del.pdf', $documento->url);
-            rename(storage_path('app/public/' . $documento->url), storage_path('app/public/' . $newPath));
+        if (!empty($documento->url) && $this->minStorage->fileExists($documento->url)) {
+            $deleteResult = $this->minStorage->deleteFile($documento->url);
+           // dd($deleteResult);
+            if (isset($deleteResult['error']) && $deleteResult['error']) {
+                throw new \Exception('Error al eliminar el archivo antiguo: ' . $deleteResult['message']);
+            }
         }
 
         $documento->delete();

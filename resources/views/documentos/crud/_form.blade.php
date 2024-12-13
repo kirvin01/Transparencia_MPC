@@ -41,10 +41,10 @@
 
 <div class="mb-3">
     <label for="url" class="form-label fw-bold">Subir PDF</label>
-    <input type="file" name="url" id="url" class="form-control" accept="application/pdf" {{ isset($documento) ? '' : 'required' }}>
+    <input type="file" name="archivo" id="archivo" class="form-control" accept="application/pdf" {{ isset($documento) ? '' : 'required' }}>
     @if(isset($documento) && $documento->url)
         <small class="form-text text-muted">Archivo actual: 
-            <a href="{{ asset('storage/' . $documento->url) }}" target="_blank">Ver PDF actual</a>
+            <a href="{{ $documento->url }}" target="_blank">Ver PDF actual</a>
         </small>
     @endif
 </div>

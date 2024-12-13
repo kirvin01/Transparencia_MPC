@@ -45,9 +45,10 @@ class Documento extends Model
     {
         return $this->belongsTo(TipoDocumento::class, 'idtipo_documento');
     }
-
+ 
     public function estado()
     {
         return $this->belongsTo(EstadoDocumento::class, 'idestado');
     }
+   
 }

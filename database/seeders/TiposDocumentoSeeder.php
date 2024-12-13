@@ -14,7 +14,7 @@ class TiposDocumentoSeeder extends Seeder
      */
     public function run(): void
     {
-        $tipos_documento = [
+        $tipo_documentos = [
             [
                 'titulo' => 'Ordenanza Regional',
                 'Abreviatura' => 'OR.',
@@ -166,6 +166,6 @@ class TiposDocumentoSeeder extends Seeder
                 'permisos' => 'do-Gerencia-Regional-Agricultura'
             ]
         ];
-        DB::table('tipos_documento')->insert($tipos_documento);
+        DB::table('tipo_documentos')->insert($tipo_documentos);
     }
 }

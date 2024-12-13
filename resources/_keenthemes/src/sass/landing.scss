@@ -6,3 +6,25 @@ body {
     background-color: #f8f9fa;
     color: #333;
 }
+
+.text-limit {
+    display: -webkit-box;
+    -webkit-line-clamp: 4; /* Cambiar el número de líneas */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.text-custom{
+    color: #870B26 !important;
+    
+}
+
+.bg-image-mpc {
+    background-image: url('/assets/media/bg/mpc-logo.webp');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 70% auto; /* 80% del ancho, ajustando el alto automáticamente */
+    width: 100%; /* Ancho completo del contenedor */
+    height: 100%; /* Alto completo del contenedor */
+}

@@ -20,16 +20,20 @@ class DocumentoFactory extends Factory
      */
     public function definition(): array
     {
+        $tipoDocumento = TipoDocumento::inRandomOrder()->first() ?? TipoDocumento::factory()->create();
+        $numero = $this->faker->unique()->numerify('###');
+        $fecha = $this->faker->date('Y-m-d');
+        
         return [
-            'idtipo_documento' => TipoDocumento::inRandomOrder()->first()->id ?? TipoDocumento::factory(),
-            'numero' => $this->faker->unique()->numerify('DOC###'),
-            'fecha' => $this->faker->date(),
+            'idtipo_documento' => $tipoDocumento->id,
+            'numero' => $numero,
+            'fecha' => $fecha,
             'fechapubli' => $this->faker->dateTime(),
             'sumilla' => $this->faker->text(800),
             'url' => $this->faker->url,
-            'idestado' => EstadoDocumento::inRandomOrder()->first()->id ?? EstadoDocumento::factory(),
+            'idestado' => EstadoDocumento::inRandomOrder()->first()?->id ?? EstadoDocumento::factory()->create()->id,
             'html' => '<p>' . $this->faker->paragraph . '</p>',
-            'titulo' => $this->faker->sentence,
+            'titulo' => $tipoDocumento->titulo . " N° " . $numero . '-' . date('Y', strtotime($fecha)),
             'created_at' => now(),
             'updated_at' => now(),
         ];

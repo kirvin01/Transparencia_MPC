@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('documentos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('idtipo_documento')->constrained('tipos_documento')->onDelete('cascade');
+            $table->foreignId('idtipo_documento')->constrained('tipo_documentos')->onDelete('cascade');
             $table->string('numero', 100);
             $table->date('fecha');
             $table->dateTime('fechapubli');
